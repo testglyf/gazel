@@ -7,302 +7,267 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #050505; color: #e5e7eb; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        :root { --bg: #050505; --text: #e5e7eb; --glass: rgba(20, 20, 20, 0.7); --border: rgba(255, 255, 255, 0.05); }
+        body.light-mode { --bg: #f9fafb; --text: #111827; --glass: rgba(255, 255, 255, 0.8); --border: rgba(0, 0, 0, 0.1); }
+
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .heading-font { font-family: 'Lexend', sans-serif; }
-        .glass { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .card-hover:hover { border-color: #00D4FF; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); transform: translateY(-8px); }
+        .glass { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid var(--border); }
+        
+        .light-mode .text-white, .light-mode .text-gray-400 { color: #1f2937; }
+        .light-mode .bg-\[\#080808\], .light-mode .bg-\[\#0a0a0a\] { background-color: #f3f4f6; }
+        .light-mode .gradient-text { background: linear-gradient(90deg, #111827, #0088aa); -webkit-background-clip: text; }
+        .light-mode .tech-icon { filter: grayscale(1) invert(0); }
+
+        .card-hover:hover { border-color: #00D4FF; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); transform: translateY(-5px); }
         .gradient-text { background: linear-gradient(90deg, #fff, #00D4FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
-        .project-img { transition: transform 0.6s ease; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
-        .card-hover:hover .project-img { transform: scale(1.1); opacity: 0.8; }
+        
+        .project-img { width: 100%; height: 100%; object-fit: contain; opacity: 1; transition: transform 0.3s ease; }
+        .project-card:hover .project-img { transform: scale(1.05); }
+        
         .tech-icon { width: 28px; height: 28px; filter: grayscale(1) invert(1); opacity: 0.7; transition: all 0.3s ease; }
         .tech-card:hover .tech-icon { filter: grayscale(0) invert(0); opacity: 1; }
         
-        /* Mobile Menu Animation */
         #mobile-menu { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(100%); }
         #mobile-menu.active { transform: translateX(0); }
+
+        #theme-toggle { cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.3s; }
+        #theme-toggle:hover { background: rgba(0, 212, 255, 0.1); }
     </style>
 </head>
 <body>
-
-    <nav class="fixed w-full z-50 glass py-4 px-8 flex justify-between items-center">
-        <div class="text-2xl font-black heading-font tracking-tighter text-white">GAZEL<span class="text-cyan-400">.</span></div>
-        
-        <div class="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest text-gray-400">
-            <a href="#work" class="hover:text-cyan-400 transition">Projects</a>
-            <a href="#tech" class="hover:text-cyan-400 transition">Stack</a>
-            <a href="#pricing" class="hover:text-cyan-400 transition">Services</a>
-        </div>
-        
-        <div class="flex items-center space-x-4">
-            <a href="mailto:hello@gazel.dev" class="hidden sm:block bg-cyan-400 text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-white transition">Contact</a>
-            
-            <button id="menu-btn" class="md:hidden text-white focus:outline-none p-2">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </div>
-    </nav>
-
-    <div id="mobile-menu" class="fixed inset-0 z-[60] glass flex flex-col justify-center items-center md:hidden">
-        <button id="close-btn" class="absolute top-6 right-8 text-gray-400 hover:text-white">
-            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+<nav class="fixed w-full z-50 glass py-4 px-8 flex justify-between items-center">
+    <div class="text-2xl font-black heading-font tracking-tighter text-white">GAZEL<span class="text-cyan-400">.</span></div>
+    <div class="hidden md:flex items-center space-x-8 text-sm font-medium uppercase tracking-widest text-gray-400">
+        <a href="#work" class="hover:text-cyan-400 transition">Projects</a> 
+        <a href="#tech" class="hover:text-cyan-400 transition">Stack</a> 
+        <a href="#pricing" class="hover:text-cyan-400 transition">Services</a>
+    </div>
+    <div class="flex items-center space-x-4">
+        <button id="theme-toggle" class="text-cyan-400" aria-label="Toggle Theme">
+            <svg id="sun-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path></svg>
+            <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
         </button>
-        <div class="flex flex-col space-y-8 text-center text-2xl font-bold heading-font tracking-tighter">
-            <a href="#work" class="mobile-link text-white hover:text-cyan-400 transition">Projects</a>
-            <a href="#tech" class="mobile-link text-white hover:text-cyan-400 transition">Stack</a>
-            <a href="#pricing" class="mobile-link text-white hover:text-cyan-400 transition">Services</a>
-            <a href="mailto:hello@gazel.dev" class="mobile-link text-cyan-400 transition">Contact</a>
-        </div>
+        <a href="mailto:hello@gazel.dev" class="hidden sm:block bg-cyan-400 text-black px-6 py-2 rounded-full text-sm font-bold hover:bg-white transition">Contact</a> 
+        <button id="menu-btn" class="md:hidden text-white focus:outline-none p-2"> <svg class="w-8 h-8" fill="none" stroke="currentColor" viewbox="0 0 24 24"> <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> </button>
     </div>
+</nav>
 
-    <section class="min-h-[80vh] flex flex-col justify-center items-center text-center px-4">
-        <div class="reveal">
-            <h1 class="text-6xl md:text-8xl font-bold heading-font mb-6 tracking-tight">GAZEL <span class="gradient-text">STUDIO.</span></h1>
-            <p class="max-w-2xl text-gray-400 text-lg mb-10 mx-auto">High-performance interfaces bridging the gap between custom code and scalable CMS architectures.</p>
-            <div class="flex justify-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400">
-                <span>WordPress</span> • <span>Framer</span> • <span>React</span> • <span>JS</span>
-            </div>
-        </div>
-    </section>
-
-    <section id="work" class="py-12 px-8 max-w-7xl mx-auto">
-      <h2 class="text-3xl font-bold heading-font mb-12 reveal tracking-tight">Projects</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            
-            <a href="https://testglyf.github.io/LUMIERE/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-j8vtG6v1QagavIOnW6MlDvvINmJoEj0KEmRy5-LIrBtLej0tqg1FP-FTY-5T-4sHW7gbrCn8giEOZk7HWmKakJO5uHUx5KJKqKWMNFM9IbfttDOecWkQGRez6ZtwGmzeWFPdILs51Bf9uhddoSwtU6wVkQQxo-UHbOzFbBN6lTPpcnRQ5GVxaneo3NxY/s320/Screenshot%202026-02-18%20004606.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">LUMIERE</h3><p class="text-sm text-gray-500">Fine Dining Experience</p></div>
-            </a>
-
-            <a href="https://testglyf.github.io/driving-schooll/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTFcV0WDPxgGPXwWjzPMEigPO_J_VE_U-08qf5vh-crAP01OguAao2HNZUZdNcyhRMYHiVssTsacKDFFxXY2T3dZREHqp34Rm5jmVzHi7T3Jzzc9I4HuWIUzIbhnouLidtsnPU6gy1UmfFaefPZH52EZbt_20RV809JfiCyj_JaWWiMeiY74x0zWXtxLvG/s320/Screenshot%202026-02-18%20004635.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Driving School</h3><p class="text-sm text-gray-500">Local Business Solution</p></div>
-            </a>
-
-            <a href="https://qlyff.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_vsPpbhv9sFgsLBqCcdYY9f_4peGsMuXITgLOi5ObEsWcDTxi9BiAwbMbHwOV4Y8XuPO7sRRZDmFRcvEXK-fQYgrxWjWQgHpmDxIEFAHsJjonNK3pf7B85D2qtqs3l_qVAUC024iUNg7SmkFLLcJt3p05uGKNvTZdRLeAamQXA-IDn8M1TqAeH9-WO4Wk/s320/Screenshot%202026-02-18%20005047.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">QLYFF</h3><p class="text-sm text-gray-500">Brand Identity Portal</p></div>
-            </a>
-
-            <a href="https://colourcontrast.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgnMFVO66g-dIc1dIBVZzVXImopxYBwbyzQNsDjaEg1jIr3ZtXG0P5B_O2iWis5RYHrm_sAXpKQG5u3GQIlZoz1j3ux62HyoWUrY49GFxa6zctAQ7j5bdOKQHZ4WPKeajmL2Ibe3YgUQAuc8h6zrCoDmg86CZg_6e2ejnWm3HxGNzMG6tGJzQ0kJNlZGzj3/s320/Screenshot%202026-02-18%20005025.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Contrast Tool</h3><p class="text-sm text-gray-500">Accessibility Validator</p></div>
-            </a>
-
-            <a href="https://daily-promise.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhnnWwU_D09IoetF9cTvp_v2GN4AsgSqHOQdFVexcbm55elgVKViYyiw_vladsu6q_GEvz9P1VH31bOT0BGSzJOUdvXVl7wQ0_YYNxfTJisXpFiGZpxLIea8I7Tt-35yNbLUXN9Fj7HD94YQvkAPJQs_xxdQ8F9Ir4lXWB-bbAXTVzPPMLDbv2xpqd3vhyphenhyphenF/s320/Screenshot%202026-02-18%20004737.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Daily Promise</h3><p class="text-sm text-gray-500">Bible Verse Engine</p></div>
-            </a>
-
-            <a href="https://leaveease.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgI5A_AjZaPYK5Hz293Pe-XK5EYlCZo9G_5j3zyz7pZ0k1C0wZr4hH5T1LuI2OnGur37PC7QFreigZmnTPyGQ-WpT3HeD0xO4uFqKEB3jyHd-YV8yeK6GwqLrzHJ7EnWrfIOk-RZalw90tjv9d1TbBCx6RG43cKwIzy25VCdM3WuaL_e8c1zUIczsg7R3VE/s320/Screenshot%202026-02-18%20004758.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">LeaveEase</h3><p class="text-sm text-gray-500">SaaS Letter Generator </p></div>
-            </a>
-
-            <a href="https://qlyffchess.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyat6ojKPPKJSdFNQCcjgPnyajNycr_VB2E3pVPqqxqgghImkjk9kl9g2F2hvRV3luH6ipovEVS9wMJqCv82rGDHagPGsCH0um4CxAugZeVYle9nLPfheZPgKnhI_GBz9axQcuWPLsnUfsznMzZP23X-8BGo_cWVLBRJXuGbbeu0CeKNvwxNTIMCDs6QvW/s320/Screenshot%202026-02-18%20004847.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Chess Logic</h3><p class="text-sm text-gray-500">Interactive Game Engine</p></div>
-            </a>
-
-            <a href="https://2dspaceshooter.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhxQa_XsphRyEWXrglJfbdgue_ZNejw-2o-1Kt8Lpl764bX5JgJGV1RExcXqQeqHBBjxrfAvZLpQtASNrxptoscATFRDVQOFG26SuJNnhX9L_p7CtjBooq74y_vUukf3LEwiavPrW1pl0JAnWJlDnM-gbMJ8MgdKV8_9Zo2fb5IIJ4QiSbRqJs92OE0oEiZ/s320/Screenshot%202026-02-18%20004928.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Space Shooter</h3><p class="text-sm text-gray-500">Canvas Physics Action</p></div>
-            </a>
-
-            <a href="https://qlyffcodepad.netlify.app/" target="_blank" class="reveal glass rounded-3xl overflow-hidden card-hover transition-all flex flex-col">
-                <div class="h-56 overflow-hidden"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEipnproIim_KKi6aW5nTAoPFBvvGVPDhp33Z0z4y5mRvVTAJUSlksXRUkqBf4nmLoQSAbzVepnnx4dfC_GOrnSMJiQ5RnVI8FmViKLU_c-wLzS2fDq6Rwve9HXrljZwlPy5F2r-4M-WAlAIqZ_T8oXNzyJbwj8wdzco4KYitugLBb9NgdMKlYrLg7mBHKWx/s320/Screenshot%202026-02-18%20004953.png" class="project-img"></div>
-                <div class="p-6"><h3 class="text-xl font-bold mb-2 text-white">Codepad</h3><p class="text-sm text-gray-500">Development Utility</p></div>
-            </a>
-        </div>
-    </section>
-
-    <section id="tech" class="py-24 px-8 bg-[#080808]">
-       <div class="max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold heading-font mb-12 reveal tracking-tight">Tech Stack</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">JS ES6+</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">HTML5</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">CSS3</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">React</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">Tailwind</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">WordPress</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">GitHub</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <div class="w-7 h-7 flex items-center justify-center">
-                    <svg class="w-full h-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase font-bold">AI</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">Framer</span>
-            </div>
-
-            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
-                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" class="tech-icon">
-                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">G-Sites</span>
-            </div>
-
-        </div>
-       </div>
-    </section>
-
-    <section class="py-24 px-8 max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold heading-font mb-12 reveal">Success Stories</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <div class="reveal glass p-10 rounded-3xl border border-gray-900">
-        <p class="text-lg text-gray-400 mb-8 italic">"GAZEL bridges the gap between creative design and deep technical logic. The Space Shooter project alone proved they can handle high-performance browser tasks flawlessly."</p>
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">AS</div>
-            <div><p class="text-white font-bold">Alex Sterling</p></div>
-        </div>
-    </div>
-
-    <div class="reveal glass p-10 rounded-3xl border border-gray-900">
-        <p class="text-lg text-gray-400 mb-8 italic">"Professionalism at every step. From the Lumiere landing page to our internal dashboard, the code was pristine and the source files were perfectly documented."</p>
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">ER</div>
-            <div><p class="text-white font-bold">Elena Rodriguez</p></div>
-        </div>
-    </div>
-
-    <div class="reveal glass p-10 rounded-3xl border border-gray-900">
-        <p class="text-lg text-gray-400 mb-8 italic">"The complexity of the Chess Logic engine built for our platform was handled with incredible precision. GAZEL doesn't just build sites; they engineer systems."</p>
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">MK</div>
-            <div><p class="text-white font-bold">Marcus Kovic</p></div>
-        </div>
-    </div>
-
-    <div class="reveal glass p-10 rounded-3xl border border-gray-900">
-        <p class="text-lg text-gray-400 mb-8 italic">"Incredible speed without sacrificing quality. We had our full brand portal live in record time, complete with a customized CMS that our team actually enjoys using."</p>
-        <div class="flex items-center space-x-4">
-            <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">SC</div>
-            <div><p class="text-white font-bold">Sarah Chen</p></div>
-        </div>
+<div id="mobile-menu" class="fixed inset-0 z-[60] glass flex flex-col justify-center items-center md:hidden">
+    <button id="close-btn" class="absolute top-6 right-8 text-gray-400 hover:text-white"> <svg class="w-10 h-10" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> </button>
+    <div class="flex flex-col space-y-8 text-center text-2xl font-bold heading-font tracking-tighter">
+        <a href="#work" class="mobile-link text-white hover:text-cyan-400 transition">Projects</a> 
+        <a href="#tech" class="mobile-link text-white hover:text-cyan-400 transition">Stack</a> 
+        <a href="#pricing" class="mobile-link text-white hover:text-cyan-400 transition">Services</a> 
+        <a href="mailto:hello@gazel.dev" class="mobile-link text-cyan-400 transition">Contact</a>
     </div>
 </div>
-    </section>
 
-    <section id="pricing" class="py-24 px-8 bg-[#0a0a0a]">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl font-bold heading-font mb-16 reveal text-center">Service Tiers</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="reveal glass p-10 rounded-3xl flex flex-col hover:border-cyan-400 transition-all">
-                    <h3 class="font-bold text-white mb-2">Essential</h3>
-                    <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Landing Pages</p>
-                    <ul class="text-sm text-gray-400 space-y-4 mb-10 flex-grow">
-                        <li>• Minimalist Logo Design</li>
-                        <li>• Direct SEO Optimization</li>
-                        <li>• High-Conversion Copywriting</li>
-                        <li class="text-cyan-400 font-bold uppercase tracking-tighter">📦 Full Source Files</li>
-                    </ul>
-                    <button class="w-full py-4 border border-gray-800 rounded-xl hover:bg-white hover:text-black transition font-bold">Get Started</button>
-                </div>
-                <div class="reveal glass p-10 rounded-3xl flex flex-col border-2 border-cyan-400 scale-105 shadow-2xl relative">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-400 text-black text-[10px] px-4 py-1 rounded-full font-black">MOST POPULAR</div>
-                    <h3 class="font-bold text-white mb-2">Pro</h3>
-                    <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Web Apps</p>
-                    <ul class="text-sm text-gray-300 space-y-4 mb-10 flex-grow">
-                        <li>• Premium Logo Kit & Identity</li>
-                        <li>• Technical SEO Framework</li>
-                        <li>• Strategic Sales Copywriting</li>
-                        <li class="text-cyan-400 font-bold uppercase tracking-tighter">🚀 GitHub Repo Access</li>
-                    </ul>
-                    <button class="w-full py-4 bg-cyan-400 text-black rounded-xl hover:bg-white transition font-bold">Choose Pro</button>
-                </div>
-                <div class="reveal glass p-10 rounded-3xl flex flex-col hover:border-cyan-400 transition-all">
-                    <h3 class="font-bold text-white mb-2">Logic</h3>
-                    <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Gaming & Engines</p>
-                    <ul class="text-sm text-gray-400 space-y-4 mb-10 flex-grow">
-                        <li>• Full Visual Brand Identity</li>
-                        <li>• Advanced SEO Architecture</li>
-                        <li>• Content Narrative Design</li>
-                        <li class="text-cyan-400 font-bold uppercase tracking-tighter">🛠️ Full Repo + Technical Docs</li>
-                    </ul>
-                    <button class="w-full py-4 border border-gray-800 rounded-xl hover:bg-white hover:text-black transition font-bold">Inquire Now</button>
-                </div>
+<section class="min-h-[80vh] flex flex-col justify-center items-center text-center px-4">
+    <div class="reveal">
+        <h1 class="text-6xl md:text-8xl font-bold heading-font mb-6 tracking-tight">GAZEL <span class="gradient-text">STUDIO.</span></h1>
+        <p class="max-w-2xl text-gray-400 text-lg mb-10 mx-auto">High-performance interfaces bridging the gap between custom code and scalable CMS architectures.</p>
+        <div class="flex justify-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400"><span>WordPress</span> • <span>Framer</span> • <span>React</span> • <span>JS</span></div>
+    </div>
+</section>
+
+<section id="work" class="py-12 px-8 max-w-7xl mx-auto">
+    <h2 class="text-3xl font-bold heading-font mb-12 reveal tracking-tight text-white">Projects</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh-j8vtG6v1QagavIOnW6MlDvvINmJoEj0KEmRy5-LIrBtLej0tqg1FP-FTY-5T-4sHW7gbrCn8giEOZk7HWmKakJO5uHUx5KJKqKWMNFM9IbfttDOecWkQGRez6ZtwGmzeWFPdILs51Bf9uhddoSwtU6wVkQQxo-UHbOzFbBN6lTPpcnRQ5GVxaneo3NxY/s320/Screenshot%202026-02-18%20004606.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">LUMIERE</h3>
+            <p class="text-sm text-gray-500">Fine Dining Experience</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgTFcV0WDPxgGPXwWjzPMEigPO_J_VE_U-08qf5vh-crAP01OguAao2HNZUZdNcyhRMYHiVssTsacKDFFxXY2T3dZREHqp34Rm5jmVzHi7T3Jzzc9I4HuWIUzIbhnouLidtsnPU6gy1UmfFaefPZH52EZbt_20RV809JfiCyj_JaWWiMeiY74x0zWXtxLvG/s320/Screenshot%202026-02-18%20004635.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Driving School</h3>
+            <p class="text-sm text-gray-500">Local Business Solution</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg_vsPpbhv9sFgsLBqCcdYY9f_4peGsMuXITgLOi5ObEsWcDTxi9BiAwbMbHwOV4Y8XuPO7sRRZDmFRcvEXK-fQYgrxWjWQgHpmDxIEFAHsJjonNK3pf7B85D2qtqs3l_qVAUC024iUNg7SmkFLLcJt3p05uGKNvTZdRLeAamQXA-IDn8M1TqAeH9-WO4Wk/s320/Screenshot%202026-02-18%20005047.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">QLYFF</h3>
+            <p class="text-sm text-gray-500">Brand Identity Portal</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgnMFVO66g-dIc1dIBVZzVXImopxYBwbyzQNsDjaEg1jIr3ZtXG0P5B_O2iWis5RYHrm_sAXpKQG5u3GQIlZoz1j3ux62HyoWUrY49GFxa6zctAQ7j5bdOKQHZ4WPKeajmL2Ibe3YgUQAuc8h6zrCoDmg86CZg_6e2ejnWm3HxGNzMG6tGJzQ0kJNlZGzj3/s320/Screenshot%202026-02-18%20005025.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Contrast Tool</h3>
+            <p class="text-sm text-gray-500">Accessibility Validator</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhnnWwU_D09IoetF9cTvp_v2GN4AsgSqHOQdFVexcbm55elgVKViYyiw_vladsu6q_GEvz9P1VH31bOT0BGSzJOUdvXVl7wQ0_YYNxfTJisXpFiGZpxLIea8I7Tt-35yNbLUXN9Fj7HD94YQvkAPJQs_xxdQ8F9Ir4lXWB-bbAXTVzPPMLDbv2xpqd3vhyphenhyphenF/s320/Screenshot%202026-02-18%20004737.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Daily Promise</h3>
+            <p class="text-sm text-gray-500">Bible Verse Engine</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgI5A_AjZaPYK5Hz293Pe-XK5EYlCZo9G_5j3zyz7pZ0k1C0wZr4hH5T1LuI2OnGur37PC7QFreigZmnTPyGQ-WpT3HeD0xO4uFqKEB3jyHd-YV8yeK6GwqLrzHJ7EnWrfIOk-RZalw90tjv9d1TbBCx6RG43cKwIzy25VCdM3WuaL_e8c1zUIczsg7R3VE/s320/Screenshot%202026-02-18%20004758.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">LeaveEase</h3>
+            <p class="text-sm text-gray-500">SaaS Letter Generator</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyat6ojKPPKJSdFNQCcjgPnyajNycr_VB2E3pVPqqxqgghImkjk9kl9g2F2hvRV3luH6ipovEVS9wMJqCv82rGDHagPGsCH0um4CxAugZeVYle9nLPfheZPgKnhI_GBz9axQcuWPLsnUfsznMzZP23X-8BGo_cWVLBRJXuGbbeu0CeKNvwxNTIMCDs6QvW/s320/Screenshot%202026-02-18%20004847.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Chess Logic</h3>
+            <p class="text-sm text-gray-500">Interactive Game Engine</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhxQa_XsphRyEWXrglJfbdgue_ZNejw-2o-1Kt8Lpl764bX5JgJGV1RExcXqQeqHBBjxrfAvZLpQtASNrxptoscATFRDVQOFG26SuJNnhX9L_p7CtjBooq74y_vUukf3LEwiavPrW1pl0JAnWJlDnM-gbMJ8MgdKV8_9Zo2fb5IIJ4QiSbRqJs92OE0oEiZ/s320/Screenshot%202026-02-18%20004928.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Space Shooter</h3>
+            <p class="text-sm text-gray-500">Canvas Physics Action</p>
+        </div>
+        <div class="reveal project-card group">
+            <div class="h-56 bg-black/40 overflow-hidden rounded-xl mb-4"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEipnproIim_KKi6aW5nTAoPFBvvGVPDhp33Z0z4y5mRvVTAJUSlksXRUkqBf4nmLoQSAbzVepnnx4dfC_GOrnSMJiQ5RnVI8FmViKLU_c-wLzS2fDq6Rwve9HXrljZwlPy5F2r-4M-WAlAIqZ_T8oXNzyJbwj8wdzco4KYitugLBb9NgdMKlYrLg7mBHKWx/s320/Screenshot%202026-02-18%20004953.png" class="project-img" /></div>
+            <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition">Codepad</h3>
+            <p class="text-sm text-gray-500">Development Utility</p>
+        </div>
+    </div>
+</section>
+
+<section id="tech" class="py-24 px-8 bg-[#080808]">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold heading-font mb-12 reveal tracking-tight text-white">Tech Stack</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">JS ES6+</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">HTML5</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">CSS3</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">React</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">Tailwind</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">WordPress</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">GitHub</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all">
+                <div class="w-7 h-7 flex items-center justify-center"><svg class="w-full h-full text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path> </svg></div>
+                <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase font-bold">AI</span>
+            </div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">Framer</span></div>
+            <div class="reveal tech-card glass p-6 rounded-2xl flex flex-col items-center justify-center space-y-3 hover:border-cyan-400 transition-all"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" class="tech-icon" /> <span class="text-[10px] font-mono tracking-widest text-gray-400 uppercase">G-Sites</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="py-24 px-8 max-w-7xl mx-auto">
+    <h2 class="text-3xl font-bold heading-font mb-12 reveal text-white">Success Stories</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="reveal glass p-10 rounded-3xl border border-gray-900">
+            <p class="text-lg text-gray-400 mb-8 italic">"GAZEL bridges the gap between creative design and deep technical logic. The Space Shooter project alone proved they can handle high-performance browser tasks flawlessly."</p>
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">AS</div>
+                <p class="text-white font-bold">Alex Sterling</p>
             </div>
         </div>
-    </section>
-
-    <footer class="py-20 px-8 border-t border-gray-900 glass">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-            <div class="text-center md:text-left mb-8 md:mb-0">
-                <div class="text-2xl font-black heading-font text-white mb-2">GAZEL<span class="text-cyan-400">.</span></div>
-                <p class="text-gray-500 text-sm">Swiftness in code, grace in design.</p>
-            </div>
-            <div class="flex space-x-8 text-sm font-bold uppercase tracking-widest text-gray-400">
-                <a href="#" class="hover:text-cyan-400">GitHub</a>
-                <a href="#" class="hover:text-cyan-400">LinkedIn</a>
-                <a href="mailto:hello@gazel.dev" class="text-cyan-400">Email</a>
+        <div class="reveal glass p-10 rounded-3xl border border-gray-900">
+            <p class="text-lg text-gray-400 mb-8 italic">"Professionalism at every step. From the Lumiere landing page to our internal dashboard, the code was pristine and the source files were perfectly documented."</p>
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">ER</div>
+                <p class="text-white font-bold">Elena Rodriguez</p>
             </div>
         </div>
-        <div class="mt-16 text-center text-xs text-gray-700 tracking-widest uppercase">
-            © 2026 GAZEL • BUILT WITH PRECISION
+        <div class="reveal glass p-10 rounded-3xl border border-gray-900">
+            <p class="text-lg text-gray-400 mb-8 italic">"The complexity of the Chess Logic engine built for our platform was handled with incredible precision. GAZEL doesn't just build sites; they engineer systems."</p>
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">MK</div>
+                <p class="text-white font-bold">Marcus Kovic</p>
+            </div>
         </div>
-    </footer>
+        <div class="reveal glass p-10 rounded-3xl border border-gray-900">
+            <p class="text-lg text-gray-400 mb-8 italic">"Incredible speed without sacrificing quality. We had our full brand portal live in record time, complete with a customized CMS that our team actually enjoys using."</p>
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold">SC</div>
+                <p class="text-white font-bold">Sarah Chen</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <script>
-        // Reveal Animations
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
-        }, { threshold: 0.15 });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+<section id="pricing" class="py-24 px-8 bg-[#0a0a0a]">
+    <div class="max-w-7xl mx-auto text-center">
+        <h2 class="text-3xl font-bold heading-font mb-16 reveal text-white">Service Tiers</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div class="reveal glass p-10 rounded-3xl flex flex-col hover:border-cyan-400 transition-all">
+                <h3 class="font-bold text-white mb-2">Essential</h3>
+                <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Landing Pages</p>
+                <ul class="text-sm text-gray-400 space-y-4 mb-10 flex-grow">
+                    <li>• Minimalist Logo Design</li>
+                    <li>• Direct SEO Optimization</li>
+                    <li>• High-Conversion Copywriting</li>
+                    <li class="text-cyan-400 font-bold uppercase tracking-tighter">📦 Full Source Files</li>
+                </ul>
+                <button class="w-full py-4 border border-gray-800 rounded-xl hover:bg-white hover:text-black transition font-bold text-white">Get Started</button>
+            </div>
+            <div class="reveal glass p-10 rounded-3xl flex flex-col border-2 border-cyan-400 scale-105 shadow-2xl relative">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-400 text-black text-[10px] px-4 py-1 rounded-full font-black">MOST POPULAR</div>
+                <h3 class="font-bold text-white mb-2">Pro</h3>
+                <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Web Apps</p>
+                <ul class="text-sm text-gray-300 space-y-4 mb-10 flex-grow">
+                    <li>• Premium Logo Kit & Identity</li>
+                    <li>• Technical SEO Framework</li>
+                    <li>• Strategic Sales Copywriting</li>
+                    <li class="text-cyan-400 font-bold uppercase tracking-tighter">🚀 GitHub Repo Access</li>
+                </ul>
+                <button class="w-full py-4 bg-cyan-400 text-black rounded-xl hover:bg-white transition font-bold">Choose Pro</button>
+            </div>
+            <div class="reveal glass p-10 rounded-3xl flex flex-col hover:border-cyan-400 transition-all">
+                <h3 class="font-bold text-white mb-2">Logic</h3>
+                <p class="text-gray-500 text-sm mb-6 uppercase tracking-widest">Gaming & Engines</p>
+                <ul class="text-sm text-gray-400 space-y-4 mb-10 flex-grow">
+                    <li>• Full Visual Brand Identity</li>
+                    <li>• Advanced SEO Architecture</li>
+                    <li>• Content Narrative Design</li>
+                    <li class="text-cyan-400 font-bold uppercase tracking-tighter">🛠️ Full Repo + Technical Docs</li>
+                </ul>
+                <button class="w-full py-4 border border-gray-800 rounded-xl hover:bg-white hover:text-black transition font-bold text-white">Inquire Now</button>
+            </div>
+        </div>
+    </div>
+</section>
 
-        // Mobile Menu Logic
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const closeBtn = document.getElementById('close-btn');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
+<footer class="py-20 px-8 border-t border-gray-900 glass">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+        <div class="text-center md:text-left mb-8 md:mb-0">
+            <div class="text-2xl font-black heading-font text-white mb-2">GAZEL<span class="text-cyan-400">.</span></div>
+            <p class="text-gray-500 text-sm">Swiftness in code, grace in design.</p>
+        </div>
+        <div class="flex space-x-8 text-sm font-bold uppercase tracking-widest text-gray-400"><a href="#" class="hover:text-cyan-400">GitHub</a> <a href="#" class="hover:text-cyan-400">LinkedIn</a> <a href="mailto:hello@gazel.dev" class="text-cyan-400">Email</a></div>
+    </div>
+    <div class="mt-16 text-center text-xs text-gray-700 tracking-widest uppercase">© 2026 GAZEL • BUILT WITH PRECISION</div>
+</footer>
 
-        const toggleMenu = () => {
-            mobileMenu.classList.toggle('active');
-            document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
-        };
+<script>
+    // Reveal Observer
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-        menuBtn.addEventListener('click', toggleMenu);
-        closeBtn.addEventListener('click', toggleMenu);
-        
-        // Close menu when a link is clicked
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', toggleMenu);
-        });
-    </script>
+    // Mobile Menu
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const closeBtn = document.getElementById('close-btn');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+    const toggleMenu = () => {
+        mobileMenu.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : 'auto';
+    };
+    menuBtn.addEventListener('click', toggleMenu);
+    closeBtn.addEventListener('click', toggleMenu);
+    mobileLinks.forEach(link => { link.addEventListener('click', toggleMenu); });
+
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        sunIcon.classList.toggle('hidden', !isLight);
+        moonIcon.classList.toggle('hidden', isLight);
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        sunIcon.classList.remove('hidden');
+        moonIcon.classList.add('hidden');
+    }
+</script>
 </body>
 </html>
